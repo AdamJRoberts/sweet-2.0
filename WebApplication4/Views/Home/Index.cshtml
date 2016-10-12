@@ -1,0 +1,76 @@
+﻿@using WebApplication4.Models
+@using Microsoft.AspNet.Identity
+@using IdentitySample.Models
+@{
+    ViewBag.Title = "Home Page";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            background-color: gray;
+        }
+
+        .button {
+            background-color: black;
+            border: none;
+            color: white;
+            padding: 5px 5px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 0px 0px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="jumbotron">
+        <h1>SWEET</h1>
+        <p class="lead">A customer service unlike any other</p>
+    </div>
+    <div>
+        <img src="http://myislandworker.com/wp-content/uploads/2016/06/helpdesk.png" alt="" style="width:1142px;height:230px;">
+    </div>
+        @if (Request.IsAuthenticated && User.IsInRole("Admin"))
+        {   <div class="row">
+        <div class="col-md-4">
+            <h2><font color="black">Tickets</font></h2>
+            <p><font color="black">Click here to view open tickets.</font></p>
+            <p>   @Html.ActionLink("Click Here ", "Index", "Tickets/Index", routeValues: null, htmlAttributes: new { @class = "btn button", style = "color:white" }) </p>
+        </div>
+        <div class="col-md-4">
+            <h2><font color="black">Appointments </font></h2>
+            <p><font color="black">Click here to view all appointments.</font></p>
+            <p>@Html.ActionLink("Click Here ", "Index", "Appointments/Index", routeValues:null, htmlAttributes: new { @class = "btn button", style = "color:white" }) </p>
+        </div>
+        <div class="col-md-4">
+            <h2><font color="black">Account</font></h2>
+            <p><font color="black">Click here to view and edit your account information.</font></p>
+            <p> @Html.ActionLink("Click Here ", "Index", "Manage", routeValues: null, htmlAttributes: new { @class = "btn button", style = "color:white" }) </p>
+        </div>
+    </div>
+        }
+    else 
+    {   <div class="row">
+        <div class="col-md-4">
+            <h2><font color="black">Tickets</font></h2>
+            <p><font color="black">Click here to open a ticket or view your tickets.</font></p>
+            <p>   @Html.ActionLink("Click Here ", "Index", "Tickets/Index", routeValues: new { stringName = User.Identity.GetUserName() }, htmlAttributes: new { @class = "btn button", style = "color:white" }) </p>
+        </div>
+        <div class="col-md-4">
+            <h2><font color="black">Appointments</font></h2>
+            <p><font color="black">Click here to view your appointments.</font></p>
+            <p>@Html.ActionLink("Click Here ", "Index", "Appointments/Index", routeValues: new { stringName = User.Identity.GetUserName() }, htmlAttributes: new { @class = "btn button", style = "color:white" }) </p>
+        </div>
+        <div class="col-md-4">
+            <h2><font color="black">Account</font></h2>
+            <p><font color="black">Click here to view and edit your account information.</font></p>
+            <p> @Html.ActionLink("Click Here ", "Index", "Manage", routeValues: null, htmlAttributes: new { @class = "btn button", style = "color:white" }) </p>
+        </div>
+    </div>
+    };
+</body>
+</html>
