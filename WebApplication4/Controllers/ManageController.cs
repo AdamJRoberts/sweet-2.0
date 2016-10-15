@@ -3,6 +3,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -36,7 +37,7 @@ namespace IdentitySample.Controllers
 
         //
         // GET: /Account/Index
-        public async Task<ActionResult> Index(ManageMessageId? message)
+        public ActionResult Index(ManageMessageId? message)
         {
             ViewBag.StatusMessage =
                 message == ManageMessageId.ChangePasswordSuccess ? "Your password has been changed."
@@ -49,11 +50,14 @@ namespace IdentitySample.Controllers
 
             var model = new IndexViewModel
             {
+                Email = new UserManager<ApplicationUser>(new Microsoft.AspNet.Identity.EntityFramework.UserStore<ApplicationUser>(new ApplicationDbContext())).FindById(User.Identity.GetUserId()).Email,
                 HasPassword = HasPassword(),
-                PhoneNumber = await UserManager.GetPhoneNumberAsync(User.Identity.GetUserId()),
-                TwoFactor = await UserManager.GetTwoFactorEnabledAsync(User.Identity.GetUserId()),
-                Logins = await UserManager.GetLoginsAsync(User.Identity.GetUserId()),
-                BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(User.Identity.GetUserId())
+                FirstName = new UserManager<ApplicationUser>(new Microsoft.AspNet.Identity.EntityFramework.UserStore<ApplicationUser>(new ApplicationDbContext())).FindById(User.Identity.GetUserId()).FirstName,
+                LastName = new UserManager<ApplicationUser>(new Microsoft.AspNet.Identity.EntityFramework.UserStore<ApplicationUser>(new ApplicationDbContext())).FindById(User.Identity.GetUserId()).LastName,
+                security1 = new UserManager<ApplicationUser>(new Microsoft.AspNet.Identity.EntityFramework.UserStore<ApplicationUser>(new ApplicationDbContext())).FindById(User.Identity.GetUserId()).security1,
+                security2 = new UserManager<ApplicationUser>(new Microsoft.AspNet.Identity.EntityFramework.UserStore<ApplicationUser>(new ApplicationDbContext())).FindById(User.Identity.GetUserId()).security2,
+                securityq1 = new UserManager<ApplicationUser>(new Microsoft.AspNet.Identity.EntityFramework.UserStore<ApplicationUser>(new ApplicationDbContext())).FindById(User.Identity.GetUserId()).securityq1,
+                securityq2 = new UserManager<ApplicationUser>(new Microsoft.AspNet.Identity.EntityFramework.UserStore<ApplicationUser>(new ApplicationDbContext())).FindById(User.Identity.GetUserId()).securityq2
             };
             return View(model);
         }
@@ -329,6 +333,76 @@ namespace IdentitySample.Controllers
             }
             var result = await UserManager.AddLoginAsync(User.Identity.GetUserId(), loginInfo.Login);
             return result.Succeeded ? RedirectToAction("ManageLogins") : RedirectToAction("ManageLogins", new { Message = ManageMessageId.Error });
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Edit([Bind(Include ="Email,Id, FirstName, LastName, security1,security2,securityq1,securityq2")] EditUserViewModel editUser, params string[] selectedRole)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await UserManager.FindByIdAsync(editUser.Id);
+                if (user == null)
+                {
+                    return HttpNotFound();
+                }
+
+                user.UserName = editUser.Email;
+                user.Email = editUser.Email;
+                user.FirstName = editUser.FirstName;
+                user.LastName = editUser.LastName; 
+                user.security1 = editUser.security1;
+                user.security2 = editUser.security2;
+                user.securityq1 = editUser.securityq1;
+                user.securityq2 = editUser.securityq2;
+
+                var userRoles = await UserManager.GetRolesAsync(user.Id);
+                selectedRole = selectedRole ?? new string[] { };
+                var result = await UserManager.AddToRolesAsync(user.Id,
+                    selectedRole.Except(userRoles).ToArray<string>());
+
+                if (!result.Succeeded)
+                {
+                    ModelState.AddModelError("", result.Errors.First());
+                    return View();
+                }
+                result = await UserManager.RemoveFromRolesAsync(user.Id,
+                    userRoles.Except(selectedRole).ToArray<string>());
+                if (!result.Succeeded)
+                {
+                    ModelState.AddModelError("", result.Errors.First());
+                    return View();
+                }
+                return RedirectToAction("Index");
+            }
+            ModelState.AddModelError("", "Something failed.");
+            return View();
+        }
+        public async Task<ActionResult> Edit(string id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            var user = await UserManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return HttpNotFound();
+            }
+
+            var userRoles = await UserManager.GetRolesAsync(user.Id);
+
+            return View(new EditUserViewModel()
+            {
+                Id = user.Id,
+                Email = user.Email,
+                // Include the Addresss info:
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                security1=user.security1, 
+                security2=user.security2, 
+                securityq1 = user.securityq1, 
+                securityq2=user.securityq2,
+            });
         }
 
         #region Helpers

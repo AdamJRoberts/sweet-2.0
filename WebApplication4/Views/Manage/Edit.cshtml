@@ -1,9 +1,9 @@
-﻿@model IdentitySample.Models.IndexViewModel
+﻿@*@model IdentitySample.Models.EditUserViewModel
 
 @{
-        ViewBag.Title = "Manage your account";
+    ViewBag.Title = "Manage your account";
 }
-@using (Html.BeginForm())
+@using (Html.BeginForm()) 
 {
     @Html.AntiForgeryToken()
     <div class="form-horizontal">
@@ -11,7 +11,7 @@
         <p class="text-success">@ViewBag.StatusMessage</p>
         @Html.ValidationSummary(true)
         @Html.HiddenFor(model => model.Id)
-         <div class="form-group">
+        <div class="form-group">
             @Html.LabelFor(model => model.Email, new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
@@ -84,4 +84,4 @@
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
-}
+}*@

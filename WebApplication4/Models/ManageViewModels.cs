@@ -2,6 +2,7 @@
 using Microsoft.Owin.Security;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Web.Mvc;
 
 namespace IdentitySample.Models
 {
@@ -9,9 +10,19 @@ namespace IdentitySample.Models
     {
         public bool HasPassword { get; set; }
         public IList<UserLoginInfo> Logins { get; set; }
-        public string PhoneNumber { get; set; }
-        public bool TwoFactor { get; set; }
-        public bool BrowserRemembered { get; set; }
+        public string Id { get; set; }
+
+        [Required(AllowEmptyStrings = false)]
+        [Display(Name = "Email")]
+        [EmailAddress]
+        public string Email { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public IEnumerable<SelectListItem> RolesList { get; set; }
+        public string security1 { get; set; } 
+        public string security2 { get; set; } 
+        public string securityq1 { get; set; } 
+        public string securityq2 { get; set; }
     }
 
     public class ManageLoginsViewModel
@@ -35,7 +46,7 @@ namespace IdentitySample.Models
 
         [DataType(DataType.Password)]
         [Display(Name = "Confirm new password")]
-        [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
+        [System.ComponentModel.DataAnnotations.Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
     }
 
@@ -54,7 +65,7 @@ namespace IdentitySample.Models
 
         [DataType(DataType.Password)]
         [Display(Name = "Confirm new password")]
-        [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
+        [System.ComponentModel.DataAnnotations.Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
     }
 

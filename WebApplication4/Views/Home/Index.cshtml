@@ -34,7 +34,7 @@
     <div>
         <img src="http://myislandworker.com/wp-content/uploads/2016/06/helpdesk.png" alt="" style="width:1142px;height:230px;">
     </div>
-        @if (Request.IsAuthenticated && User.IsInRole("Admin"))
+        @if (Request.IsAuthenticated && User.IsInRole("Admin") || User.IsInRole("Employee"))
         {   <div class="row">
         <div class="col-md-4">
             <h2><font color="black">Tickets</font></h2>
@@ -68,7 +68,7 @@
         <div class="col-md-4">
             <h2><font color="black">Account</font></h2>
             <p><font color="black">Click here to view and edit your account information.</font></p>
-            <p> @Html.ActionLink("Click Here ", "Index", "Manage", routeValues: null, htmlAttributes: new { @class = "btn button", style = "color:white" }) </p>
+            <p> @Html.ActionLink("Click Here ", "Index", "Manage", routeValues: new { stringName = User.Identity.GetUserName() }, htmlAttributes: new { @class = "btn button", style = "color:white" }) </p>
         </div>
     </div>
     };
